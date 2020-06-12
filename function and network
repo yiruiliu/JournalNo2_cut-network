@@ -1,0 +1,80 @@
+ncinstancetop:=[[[[8],[3,8]],[[8,9],[1,2,8,9]]],3,9];
+cutVar_top:=[[[1,2],[1,2,4],[2,3],[2,3,5],[4,5],[6,7],[6,7,8],[7,9]],3,9];
+
+
+ncinstancetop:=[[[[1,2],[1,2,4]],[[2,3],[2,3,5]],[[6,7],[6,7,8]],[[7],[7,9]],[[8],[3,8]],[[8,9],[1,2,8,9]]],3,9];
+cutVar_top:=[[[1,2],[1,2,4],[2,3],[2,3,5],[4,5],[6,7],[6,7,8],[7,9]],3,9];
+
+
+
+  
+  
+  GenShannonUnBounded_decomposed:=function ( N1,N2,N3 ) #Calculate \Gamma_{N1\cup N3}\time \Gamma_{N2\cup N3}
+    local  Ntop,ntop,Nbottom,nbottom,nwhole,rlist, mtx, str, i, j, shineq, shineqT, 
+    nset_i, ineq, pairsTop, pairsBottom, p, Klist, K, nset_ij, greq, neq, A, AT, b, s;
+    shineq := [  ];
+    Ntop := Union(N1,N3);
+    ntop := Size(Ntop);
+    Nbottom := Union(N2,N3);
+    nbotton := Size(Nbottom);
+    nwhole := Size(N1) + Size(N2) + Size(N3);
+    for i  in Ntop  do
+        nset_i := ShallowCopy(Ntop);
+        SubtractSet( nset_i, [ i ] );
+        ineq := ZeroMutable( [ 1 .. 2 ^ nwhole ] );
+        ineq[set2int( Ntop ) + 1] := 1;
+        ineq[set2int( nset_i ) + 1] := -1;
+        Append( shineq, [ ineq ] );
+    od;
+    for i  in Nbottom  do
+        nset_i := ShallowCopy(Nbottom);
+        SubtractSet( nset_i, [ i ] );
+        ineq := ZeroMutable( [ 1 .. 2 ^ nwhole ] );
+        ineq[set2int( Nbottom ) + 1] := 1;
+        ineq[set2int( nset_i ) + 1] := -1;
+        Append( shineq, [ ineq ] );
+    od;
+    pairsTop := Combinations( Ntop, 2 );
+    for p  in pairsTop  do
+        nset_ij := ShallowCopy(Ntop);
+        SubtractSet( nset_ij, p );
+        Klist := Combinations( nset_ij );
+        for K  in Klist  do
+            ineq := ZeroMutable( [ 1 .. 2 ^ nwhole ] );
+            ineq[set2int( Union( K, [ p[1] ] ) ) + 1] := 1;
+            ineq[set2int( Union( K, [ p[2] ] ) ) + 1] := 1;
+            ineq[set2int( Union( K, p ) ) + 1] := -1;
+            if Size( K ) > 0  then
+                ineq[set2int( K ) + 1] := -1;
+            fi;
+            Append( shineq, [ ineq ] );
+        od;
+    od;
+    pairsBottom := Combinations( Nbottom, 2 );
+    for p  in pairsBottom  do
+        nset_ij := ShallowCopy(Nbottom);
+        SubtractSet( nset_ij, p );
+        Klist := Combinations( nset_ij );
+        for K  in Klist  do
+            ineq := ZeroMutable( [ 1 .. 2 ^ nwhole ] );
+            ineq[set2int( Union( K, [ p[1] ] ) ) + 1] := 1;
+            ineq[set2int( Union( K, [ p[2] ] ) ) + 1] := 1;
+            ineq[set2int( Union( K, p ) ) + 1] := -1;
+            if Size( K ) > 0  then
+                ineq[set2int( K ) + 1] := -1;
+            fi;
+            Append( shineq, [ ineq ] );
+        od;
+    od;
+    shineq := - shineq;
+    shineqT := TransposedMat(shineq);
+    AT := [ ];
+    for s in shineqT do
+        if Maximum(s) = 1 or Minimum(s) = -1 then
+            Append(AT,[s]);
+        fi;
+    od;
+    A := TransposedMat(AT);
+    b := ZeroMutable([1..Size(A)]);
+    return [ A, b ];
+end;
