@@ -82,7 +82,7 @@ GenShannonUnBounded_decomposed_removeZero:=function ( N1,N2,N3 ) #Calculate \Gam
   return [ A, b ];
 end;
 
-GenShannonUnBounded_decomposed_removeZero:=function ( N1,N2,N3 ) #Calculate \Gamma_{N1\cup N3}\time \Gamma_{N2\cup N3}
+GenShannonUnBounded_decomposed:=function ( N1,N2,N3 ) #Calculate \Gamma_{N1\cup N3}\time \Gamma_{N2\cup N3}
   local  Ntop,ntop,Nbottom,nbottom,nwhole,rlist, mtx, str, i, j, shineq, 
   nset_i, ineq, pairsTop, pairsBottom, p, Klist, K, nset_ij, greq, neq, A, b, s;
   shineq := [  ];
@@ -142,4 +142,114 @@ GenShannonUnBounded_decomposed_removeZero:=function ( N1,N2,N3 ) #Calculate \Gam
   shineq := - shineq;
   b := ZeroMutable([1..Size(shineq)]);
   return [ shineq, b ];
+end;
+
+NCShannonBounded_decomposition := function ( ncinstance, N1,N2,N3 )
+    local  ShOB, i, linrows, con, conlin, j, conineq;
+    ShOB := GenShannonUnBounded_decomposed( N1,N2,N3 );
+    i := Size( ShOB[1] ) + 1;
+    linrows := [  ];
+    for con  in ncinstance[1]  do
+        conlin := ZeroMutable( [ 1 .. 2 ^ ncinstance[3] - 1 ] );
+        conlin[set2int( con[1] )] := 1;
+        conlin[set2int( con[2] )] := -1;
+        Append( ShOB[1], [ conlin ] );
+        Append( ShOB[2], [ 0 ] );
+        Append( linrows, [ i ] );
+        i := i + 1;
+    od;
+    conlin := ZeroMutable( [ 1 .. 2 ^ ncinstance[3] - 1 ] );
+    for j  in [ 1 .. ncinstance[2] ]  do
+        conlin[set2int( [ j ] )] := 1;
+    od;
+    conlin[set2int( [ 1 .. ncinstance[2] ] )] := -1;
+    Append( ShOB[1], [ conlin ] );
+    Append( ShOB[2], [ 0 ] );
+    Append( linrows, [ i ] );
+    i := i + 1;
+    for j  in [ 1 .. Size( ShOB[1] ) ]  do
+        ShOB[1][j] := Concatenation( ZeroMutable( [ 1 .. ncinstance[3] ] ), ShOB[1][j] );
+    od;
+    for j  in [ 1 .. ncinstance[2] ]  do
+        conineq := ZeroMutable( [ 1 .. 2 ^ ncinstance[3] - 1 + ncinstance[3] ] );
+        conineq[j] := 1;
+        conineq[ncinstance[3] + set2int( [ j ] )] := -1;
+        Append( ShOB[1], [ conineq ] );
+        Append( ShOB[2], [ 0 ] );
+        conineq := ZeroMutable( [ 1 .. 2 ^ ncinstance[3] - 1 + ncinstance[3] ] );
+        conineq[j] := -1;
+        Append( ShOB[1], [ conineq ] );
+        Append( ShOB[2], [ 0 ] );
+    od;
+    for j  in [ ncinstance[2] + 1 .. ncinstance[3] ]  do
+        conineq := ZeroMutable( [ 1 .. 2 ^ ncinstance[3] - 1 + ncinstance[3] ] );
+        conineq[j] := -1;
+        conineq[ncinstance[3] + set2int( [ j ] )] := 1;
+        Append( ShOB[1], [ conineq ] );
+        Append( ShOB[2], [ 0 ] );
+        conineq := ZeroMutable( [ 1 .. 2 ^ ncinstance[3] - 1 + ncinstance[3] ] );
+        conineq[j] := -1;
+        Append( ShOB[1], [ conineq ] );
+        Append( ShOB[2], [ 0 ] );
+    od;
+    conineq := ZeroMutable( [ 1 .. 2 ^ ncinstance[3] - 1 + ncinstance[3] ] );
+    for j  in [ 1 .. ncinstance[3] ]  do
+        conineq[j] := 1;
+    od;
+    Append( ShOB[1], [ conineq ] );
+    Append( ShOB[2], [ 1 ] );
+    return [ ShOB[1], ShOB[2], linrows ];
+end;
+
+
+NCRateRegionOB_decomposition := function ( ncinstance, N1,N2,N3, optargs ) #Calculate rate region from \Gamma_{N1\cup N3}\time \Gamma_{N2\cup N3}
+    local  rlist, A, b, linrows, G, rlist1, ineq, ineqorb, row, rrA, rrb, onemap,
+    nslist, idx, nsrec, los, lolos, Oi, O, trans_ineq;
+    rlist := NCShannonBounded_decomposition( ncinstance, N1,N2,N3 );
+    A := rlist[1];
+    A := RemovezeroColumn(A);
+    b := rlist[2];
+    linrows := rlist[3];
+    G := Group( [ () ] );
+    if Size( optargs ) > 0  then
+        nslist := [  ];
+        nsrec := optargs[1];
+        for idx  in RecNamesInt( nsrec )  do
+            lolos := nsrec.(idx);
+            for los  in lolos  do
+                if idx = 1  then
+                    ineq := ZYNonShannon( los, ncinstance[3] );
+                    ineqorb := Orbit( G, ineq, OnEntropySpace );
+                    Append( nslist, ineqorb );
+                else
+                    ineq := DFZNonShannon( idx - 1, los, ncinstance[3] );
+                    ineqorb := Orbit( G, ineq, OnEntropySpace );
+                    Append( nslist, ineqorb );
+                fi;
+            od;
+        od;
+        Append( A, nslist );
+        Append( b, ZeroMutable( [ 1 .. Size( nslist ) ] ) );
+    fi;
+    rlist1 := symCHM( A, b, linrows, ncinstance[3], G, OnProjPts, OnProjIneq, false );
+    Display( Concatenation( "stats:  No. of LPs solved = ", String( rlist1[3][1] ),
+       ", \n\t No. of facets = ", String( Size( rlist1[2] ) ),
+       ", \n\tDD stepsizes beyond initial hull = ", String( rlist1[3][2] ) ) );
+    rrA := [  ];
+    rrb := [  ];
+    for row  in rlist1[2]  do
+        onemap := function ( x )
+              return 1;
+          end;
+        if not row = List( [ 1 .. Size( row ) ], onemap )  then
+            Append( rrA, [ row{[ 1 .. Size( row ) - 1 ]} ] );
+            Append( rrb, [ row[Size( row )] ] );
+        fi;
+    od;
+    trans_ineq := [  ];
+    Oi := OrbitsDomain( G, rrA, OnProjIneq );
+    for O  in Oi  do
+        Append( trans_ineq, [ O[1] ] );
+    od;
+    return [ trans_ineq, RRparse( ncinstance, trans_ineq ) ];
 end;
