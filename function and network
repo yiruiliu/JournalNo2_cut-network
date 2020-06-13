@@ -1,9 +1,9 @@
-ncinstancetop:=[[[[8],[3,8]],[[8,9],[1,2,8,9]]],3,9];
-cutVar_top:=[[[1,2],[1,2,4],[2,3],[2,3,5],[4,5],[6,7],[6,7,8],[7,9]],3,9];
+#ncinstancetop:=[[[[8],[3,8]],[[8,9],[1,2,8,9]]],3,9];
+#cutVar_top:=[[[1,2],[1,2,4],[2,3],[2,3,5],[4,5],[6,7],[6,7,8],[7,9]],3,9];
 
 
-ncinstancetop:=[[[[1,2],[1,2,4]],[[2,3],[2,3,5]],[[6,7],[6,7,8]],[[7],[7,9]],[[8],[3,8]],[[8,9],[1,2,8,9]]],3,9];
-cutVar_top:=[[[1,2],[1,2,4],[2,3],[2,3,5],[4,5],[6,7],[6,7,8],[7,9]],3,9];
+#ncinstancetop:=[[[[1,2],[1,2,4]],[[2,3],[2,3,5]],[[6,7],[6,7,8]],[[7],[7,9]],[[8],[3,8]],[[8,9],[1,2,8,9]]],3,9];
+#cutVar_top:=[[[1,2],[1,2,4],[2,3],[2,3,5],[4,5],[6,7],[6,7,8],[7,9]],3,9];
 
 RemovezeroColumn := function(A)
 local s,AT,ATnew;
@@ -201,7 +201,8 @@ NCShannonBounded_decomposition := function ( ncinstance, N1,N2,N3 )
     return [ ShOB[1], ShOB[2], linrows ];
 end;
 
-
+# ncinstance:=[[[[1,2],[1,2,4]],[[2,3],[2,3,5]],[[4,5],[4,5,6]],[[5],[5,7]],[[6,7],[6,7,8]],[[7],[7,9]],[[8,9],[8,9,10]],[[9],[9,11]],[[10],[3,10]],[[10,11],[1,2,10,11]]],3,11];
+# N1 :=[1,2,3,10,11]; N2:=[6,7]; N3:=[4,5,8,9];
 NCRateRegionOB_decomposition := function ( ncinstance, N1,N2,N3, optargs ) #Calculate rate region from \Gamma_{N1\cup N3}\time \Gamma_{N2\cup N3}
     local  rlist, A, b, linrows, G, rlist1, ineq, ineqorb, row, rrA, rrb, onemap,
     nslist, idx, nsrec, los, lolos, Oi, O, trans_ineq;
