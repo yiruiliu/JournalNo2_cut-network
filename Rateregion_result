@@ -66,16 +66,18 @@ R7 + R9 + R10 + R11 >= + w1 + w2 + w3 \n" ]
 
 ncinstancetop:=[[[[1,3,5,6],[1,3,4,5,6]],[[1,2,6],[1,2,5,6]],[[2,3],[2,3,6]]],3,9];
 cutVar_top:=[[[4,5],[4,5,7],[4,6],[4,6,8],[5,6,7],[5,6,7,9],[7,8],[8,9],[7,9]],3,9];
-
+numofCutandSingle_top := 18;  # bug on old version ITCP
  
 ncinstancetop:=[[[[1,3,5,6],[1,3,4,5,6]],[[1,2,6],[1,2,5,6]],[[2,3],[2,3,6]],[[4,5],[4,5,7]],[[4,6],[4,6,8]],[[5,6,7],[5,6,7,9]]],3,9];
-cutVar_top:=[[[7,8],[8,9],[7,9]],3,9];
-numofCutandSingle_top := 12; 
-numofCutandSingle_top := 18; #bug on old version ITCP
+cutVar_top:=[[[1,2,3],[7,8],[8,9],[7,9]],3,9];
+numofCutandSingle_top := 13; # bug on old version ITCP
+
+
 SHLT:=AddconstraintsTopAndBottom_noindep(ncinstancetop);;
-	AAT:=Permute_marginalAndJoin(cutVar_top);;
-	SHTA:=Permute_matrix_parallel(SHLT[1],AAT);;
-	SHT_P:=SHTA[1];;
-	SbT:=SHLT[2];;
-	A1:=SHTA[2];;
-	linrowsT:=SHLT[3];;
+AAT:=Permute_marginalAndJoin(cutVar_top);;
+SHTA:=Permute_matrix_parallel(SHLT[1],AAT);;
+SHT_P:=SHTA[1];;
+SbT:=SHLT[2];;
+A1:=SHTA[2];;
+linrowsT:=SHLT[3];;
+rlistTop:=ProjectOntoUseful_Var(SHT_P,SbT,numofCutandSingle_top,linrowsT);
