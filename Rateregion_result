@@ -378,3 +378,21 @@ SbT:=SHLT[2];;
 A1:=SHTA[2];;
 linrowsT:=SHLT[3];;
 rlistTop:=ProjectOntoUseful_Var(SHT_P,SbT,numofCutandSingle_top,linrowsT);
+
+#########network instances that choke current InitialHull
+#net1: implied equality in the projected region
+ncinstancetop:=[[ [[7],[3,7]], [[6,7],[1,2,6,7]] ],3,7];
+cutVar_top:=[[[1,2],[1,2,4],[1,3],[1,3,5],[4,5],[6,7]],3,7];
+numofCutandSingle_top:=13;
+SHLT:=AddconstraintsTopAndBottom_indep(ncinstancetop);;
+AAT:=Permute_marginalAndJoin(cutVar_top);;
+SHTA:=Permute_matrix_parallel(SHLT[1],AAT);;
+SHT_P:=SHTA[1];;
+SbT:=SHLT[2];;
+A1:=SHTA[2];;
+linrowsT:=SHLT[3];;
+rlistTop:=ProjectOntoUseful_Var(SHT_P,SbT,numofCutandSingle_top,linrowsT);
+
+#net2:
+ncinstancetop:=[[ [[5],[3,5]] ],3,7];
+cutVar_top:=[[[1,2],[1,2,4],[1,3],[1,3,5],[4,5],[6,7]],3,7];
