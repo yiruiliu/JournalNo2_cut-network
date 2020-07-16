@@ -329,7 +329,7 @@ AddconstraintsTopAndBottom_indep:=function(ncinstancetop)
 	return [ShOB1[1],ShOB1[2],linrows];
 end;
 
-ProjectOntoUseful_Var:=function(SH_P,Sb1,numofVar,linrows)
+ProjectOntoUseful_Var:=function(SH_P,Sb1,ProjDim,linrows)
 	local proj_SH,proj_Sb,conlin,j,G,rlist;
 	proj_SH:=ShallowCopy(SH_P);
 	proj_Sb:=ShallowCopy(Sb1);
@@ -341,13 +341,13 @@ ProjectOntoUseful_Var:=function(SH_P,Sb1,numofVar,linrows)
 	od;
 
 	conlin := ZeroMutable( [ 1 .. Size(SH_P[1]) ] );
-	for j  in [ 1 .. numofVar ]  do    #### sum<=1
+	for j  in [ 1 .. ProjDim ]  do    #### sum<=1
 	conlin[j] :=1;
 	od;
 	Append( proj_SH, [ conlin ] );
 	Append( proj_Sb, [  1 ] );
 	G := Group( [ () ] );
-	rlist := symCHM( proj_SH, proj_Sb, linrows, numofVar, G, OnProjPts, OnProjIneq, false );
+	rlist := symCHM( proj_SH, proj_Sb, linrows, ProjDim, G, OnProjPts, OnProjIneq, false );
 	return rlist;
 end;
 
