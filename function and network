@@ -260,18 +260,15 @@ end;
 #  N1:=[4,5,6]; N2:=[9,10,11]; N3:=[1,2,3,7,8];
 #rlsitOneTime := NCRateRegionOB_decomposition(ncinstance, N1,N2,N3,[]);
 ############################################################################################ 3-time projection
-Permute_matrix_parallel_reverse:=function(B,A) #subfunction
-# sort columns of matrix B in parallel with indices A and then reverse columns of B
+Permute_matrix_parallel:=function(B,A)
 	local Bt,Bf,A1;
 	Bt:=TransposedMat(B);
 	Bt:=ShallowCopy(Bt);
 	A1:=ShallowCopy(A);
 	SortParallel(A1,Bt);
-	Bf:=Reversed(Bt);
-	Bf:=TransposedMat(Bf);
+	Bf:=TransposedMat(Bt);
 	return [Bf,A1];
 end;
-
 
 
 Permute_marginalAndJoin:=function(numofVar,listofedge) #subfunction
@@ -361,7 +358,7 @@ end;
 
 SHLT:=AddconstraintsTopAndBottom_indep(ncinstancetop);;
 AAT:=Permute_marginalAndJoin(numofVar,listofedge_top);;
-SHTA:=Permute_matrix_parallel_reverse(SHLT[1],AAT);;
+SHTA:=Permute_matrix_parallel(SHLT[1],AAT);;
 SHT_P:=SHTA[1];;
 SbT:=SHLT[2];;
 A1:=SHTA[2];;
