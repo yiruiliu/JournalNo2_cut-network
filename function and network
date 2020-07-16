@@ -201,9 +201,8 @@ NCShannonBounded_decomposition := function ( ncinstance, N1,N2,N3 )
     return [ ShOB[1], ShOB[2], linrows ];
 end;
 
-# ncinstance:=[[[[1,2],[1,2,4]],[[2,3],[2,3,5]],[[4,5],[4,5,6]],[[5],[5,7]],[[6,7],[6,7,8]],[[7],[7,9]],[[8,9],[8,9,10]],[[9],[9,11]],[[10],[3,10]],[[10,11],[1,2,10,11]]],3,11];
-# N1 :=[1,2,3,10,11]; N2:=[6,7]; N3:=[4,5,8,9];
-#  N1:=[4,5,6]; N2:=[9,10,11]; N3:=[1,2,3,7,8];
+
+############################################################################## One time projection
 NCRateRegionOB_decomposition := function ( ncinstance, N1,N2,N3, optargs ) #Calculate rate region from \Gamma_{N1\cup N3}\time \Gamma_{N2\cup N3}
     local  rlist, A, b, linrows, G, rlist1, ineq, ineqorb, row, rrA, rrb, onemap,
     nslist, idx, nsrec, los, lolos, Oi, O, trans_ineq;
@@ -255,3 +254,21 @@ NCRateRegionOB_decomposition := function ( ncinstance, N1,N2,N3, optargs ) #Calc
     od;
     return [ trans_ineq, RRparse( ncinstance, trans_ineq ) ];
 end;
+
+# ncinstance:=[[[[1,2],[1,2,4]],[[2,3],[2,3,5]],[[4,5],[4,5,6]],[[5],[5,7]],[[6,7],[6,7,8]],[[7],[7,9]],[[8,9],[8,9,10]],[[9],[9,11]],[[10],[3,10]],[[10,11],[1,2,10,11]]],3,11];
+# N1 :=[1,2,3,10,11]; N2:=[6,7]; N3:=[4,5,8,9];
+#  N1:=[4,5,6]; N2:=[9,10,11]; N3:=[1,2,3,7,8];
+rlsitOneTime := NCRateRegionOB_decomposition(ncinstance, N1,N2,N3,[]);
+############################################################################################ 3-time projection
+
+
+SHLT:=AddconstraintsTopAndBottom_indep(ncinstancetop);;
+AAT:=Permute_marginalAndJoin(cutVar_top);;
+SHTA:=Permute_matrix_parallel(SHLT[1],AAT);;
+SHT_P:=SHTA[1];;
+SbT:=SHLT[2];;
+A1:=SHTA[2];;
+linrowsT:=SHLT[3];;
+rlistTop:=ProjectOntoUseful_Var(SHT_P,SbT,numofCutandSingle_top,linrowsT);
+
+
