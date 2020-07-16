@@ -365,4 +365,32 @@ A1:=SHTA[2];;
 linrowsT:=SHLT[3];;
 rlistTop:=ProjectOntoUseful_Var(SHT_P,SbT,Length(listofedge_top),linrowsT);
 
-
+AddOmegaAndR := function(A,Equal,numofSource, numofEdge)
+	local numofVar, j, conineq, linrows, b;
+	numofVar := numofSource + numofEdge;
+	linrows := [1 + Size(A)..Size(Equal) + Size(A)];
+	Append(A, Equal);
+	for j  in [ 1 .. Size( A ) ]  do
+		A[j] := Concatenation( ZeroMutable( [ 1 .. numofVar ] ), A[j] );
+	od;
+	for j  in [ 1 .. numofSource ]  do
+		conineq := ZeroMutable( [ 1 .. Size(A[1]) ] );
+		conineq[j] := 1;
+		conineq[j + numofVar] := -1;
+		Append( A, [ conineq ] );
+		conineq := ZeroMutable( [ 1 .. Size(A[1]) ] );
+		conineq[j] := -1;
+		Append(A, [ conineq ] );
+        od;
+	for j  in [ 1 .. numofEdge ]  do
+		conineq := ZeroMutable( [ 1 .. Size(A[1]) ] );
+		conineq[j + numofSource] := -1;
+		conineq[ j + numofSource + numofVar] := 1;
+		Append( A, [ conineq ] );
+		conineq := ZeroMutable( [ 1 .. Size(A[1]) ] );
+		conineq[j + numofSource] := -1;
+		Append( A, [ conineq ] );
+        od;
+	b := ZeroMutable([1..Size(A)]);
+	return[A,b,linrows];
+end;
