@@ -204,7 +204,7 @@ linrowsT:=SHLT[3];;
 rlisttop:=ProjectOntoUseful_Var(SHT_P,SbT,Length(listofedge_top),linrowsT);
 
 #ncinstancebottom:=[[  ],3,6];
-#listofedge_bottom:=[[1],[2],[3],[4],[5],[6],[1,2],[1,2,3],[2,4],[3,4],[3,4,5],[4,6],[5,6]]; #[1,2],[1,3] has equalities
+#listofedge_bottom:=[[1],[2],[3],[4],[5],[6],[1,2],[1,2,3],[2,4],[3,4],[3,4,5],[4,6],[5,6]]; 
 #numofVar:=6;
 SHLT:=AddconstraintsTopAndBottom_noindep(ncinstancebottom);;
 AAT:=Permute_marginalAndJoin(numofVar,listofedge_bottom);;
