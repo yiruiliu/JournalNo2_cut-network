@@ -1208,7 +1208,7 @@ Combine:=
  ################################################################# actually do the cut ( \cup \mathcal{Q}_{\mathcal{N}_3})
 #Net1 situation1: N1:=[4,5,6];N2:=[10,11,12];N3:=[1,2,3,7,8,9];
 #ncinstancetop:=[[ [[1,2],[1,2,4]], [[1,3],[1,3,5]], [[6,7],[6,7,8]], [[7],[7,9]], [[8],[3,8]], [[8,9],[1,2,8,9]] ],3,9];
-#listofedge_top:=[[1],[2],[3],[4],[5],[6],[7],[8],[9],[4,5],[4,6],[4,7],[5,6],[5,7],[6,7],[4,5,6],[4,5,7]]; # [4,6,7],[5,6,7],[4,5,6,7]has equalities
+#listofedge_top:=[[1],[2],[3],[4],[5],[6],[7],[8],[9],[4,5],[4,6],[4,7],[5,6],[5,7],[6,7],[4,5,6],[4,5,7],[4,5,6,7],[4,6,7],[5,6,7]]; # [4,6,7],[5,6,7],[4,5,6,7]has equalities
 
 #numofVar:=9;
 SHLT:=AddconstraintsTopAndBottom_indep(ncinstancetop);;
@@ -1220,8 +1220,8 @@ A1:=SHTA[2];;
 linrowsT:=SHLT[3];;
 rlisttop:=ProjectOntoUseful_Var(SHT_P,SbT,Length(listofedge_top),linrowsT);
 
-#ncinstancebottom:=[[  ],3,6];
-#listofedge_bottom:=[[1],[2],[3],[4],[5],[6],[1,2],[1,2,3],[2,4],[3,4],[3,4,5],[4,6],[5,6]]; 
+#ncinstancebottom:=[[[[1,2],[1,2,3]], [[3],[3,4]], [[3,4],[3,4,5]], [[4],[4,6]] ],3,6];
+#listofedge_bottom:=[[1],[2],[3],[4],[5],[6],[1,2],[1,5],[1,6],[2,5],[2,6],[5,6],[1,2,5],[1,2,6],[1,5,6],[2,5,6],[1,2,5,6]]; 
 #numofVar:=6;
 SHLT:=AddconstraintsTopAndBottom_noindep(ncinstancebottom);;
 AAT:=Permute_marginalAndJoin(numofVar,listofedge_bottom);;
