@@ -1,0 +1,133 @@
+GenShannonUnBounded_decomposed:=function ( N1,N2,N3 ) #Calculate \Gamma_{N1\cup N3}\time \Gamma_{N2\cup N3}
+  local  Ntop,ntop,Nbottom,nbottom,nwhole,rlist, mtx, str, i, j, shineq, 
+  nset_i, ineq, pairsTop, pairsBottom, p, Klist, K, nset_ij, greq, neq, A, b, s;
+  shineq := [  ];
+  Ntop := Union(N1,N3);
+  ntop := Size(Ntop);
+  Nbottom := Union(N2,N3);
+  nbotton := Size(Nbottom);
+  nwhole := Size(N1) + Size(N2) + Size(N3);
+  for i  in Ntop  do
+      nset_i := ShallowCopy(Ntop);
+      SubtractSet( nset_i, [ i ] );
+      ineq := ZeroMutable( [ 1 .. 2 ^ nwhole - 1] );
+      ineq[set2int( Ntop ) ] := 1;
+      ineq[set2int( nset_i ) ] := -1;
+      Append( shineq, [ ineq ] );
+  od;
+  for i  in Nbottom  do
+      nset_i := ShallowCopy(Nbottom);
+      SubtractSet( nset_i, [ i ] );
+      ineq := ZeroMutable( [ 1 .. 2 ^ nwhole - 1] );
+      ineq[set2int( Nbottom ) ] := 1;
+      ineq[set2int( nset_i ) ] := -1;
+      Append( shineq, [ ineq ] );
+  od;
+  pairsTop := Combinations( Ntop, 2 );
+  for p  in pairsTop  do
+      nset_ij := ShallowCopy(Ntop);
+      SubtractSet( nset_ij, p );
+      Klist := Combinations( nset_ij );
+      for K  in Klist  do
+          ineq := ZeroMutable( [ 1 .. 2 ^ nwhole - 1 ] );
+          ineq[set2int( Union( K, [ p[1] ] ) ) ] := 1;
+          ineq[set2int( Union( K, [ p[2] ] ) ) ] := 1;
+          ineq[set2int( Union( K, p ) ) ] := -1;
+          if Size( K ) > 0  then
+              ineq[set2int( K ) ] := -1;
+          fi;
+          Append( shineq, [ ineq ] );
+      od;
+  od;
+  pairsBottom := Combinations( Nbottom, 2 );
+  for p  in pairsBottom  do
+      nset_ij := ShallowCopy(Nbottom);
+      SubtractSet( nset_ij, p );
+      Klist := Combinations( nset_ij );
+      for K  in Klist  do
+          ineq := ZeroMutable( [ 1 .. 2 ^ nwhole - 1] );
+          ineq[set2int( Union( K, [ p[1] ] ) ) ] := 1;
+          ineq[set2int( Union( K, [ p[2] ] ) ) ] := 1;
+          ineq[set2int( Union( K, p ) ) ] := -1;
+          if Size( K ) > 0  then
+              ineq[set2int( K ) ] := -1;
+          fi;
+          Append( shineq, [ ineq ] );
+      od;
+  od;
+  shineq := - shineq;
+  b := ZeroMutable([1..Size(shineq)]);
+  return [ shineq, b ];
+end;
+
+#Gamma 5 with N1:=[1]; N2:=[5]; N3:=[2,3,4];
+# listofedge:=[[1],[2],[3],[4],[5],[2,3],[2,4],[3,4],[2,3,4]];
+# numofVar:=5;
+SHLT:=GenShannonUnBounded_decomposed(N1,N2,N3);
+AAT:=Permute_marginalAndJoin(numofVar,listofedge);;
+SHTA:=Permute_matrix_parallel(SHLT[1],AAT);;
+SHT_P:=SHTA[1];;
+SbT:=SHLT[2];;
+A1:=SHTA[2];;
+linrowsT:=SHLT[3];;
+rlistC:=ProjectOntoUseful_Var(SHT_P,SbT,Length(listofedge),linrowsT);
+[ [ [ 1, 0, 0, 0, 0, 0, 0, 0, 0 ], [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ], [ 0, 1/4, 0, 0, 0, 1/4, 1/4, 0, 1/4 ],
+      [ 0, 0, 0, 1/4, 0, 0, 1/4, 1/4, 1/4 ], [ 0, 1/6, 1/6, 0, 0, 1/6, 1/6, 1/6, 1/6 ],
+      [ 0, 0, 1/4, 0, 0, 1/4, 0, 1/4, 1/4 ], [ 0, 0, 1/6, 1/6, 0, 1/6, 1/6, 1/6, 1/6 ],
+      [ 0, 1/6, 0, 1/6, 0, 1/6, 1/6, 1/6, 1/6 ], [ 0, 1/7, 1/7, 1/7, 0, 1/7, 1/7, 1/7, 1/7 ],
+      [ 0, 0, 0, 0, 1, 0, 0, 0, 0 ], [ 0, 1/11, 1/11, 1/11, 0, 2/11, 2/11, 2/11, 2/11 ] ],
+  [ [ 0, 0, 0, 1, 0, 0, -1, -1, 1, 0 ], [ 0, 1, 0, 0, 0, -1, -1, 0, 1, 0 ], [ 0, 0, 1, 0, 0, -1, 0, -1, 1, 0 ],
+      [ -1, 0, 0, 0, 0, 0, 0, 0, 0, 0 ], [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ], [ 0, 0, 0, 0, 0, 0, 0, 1, -1, 0 ],
+      [ 0, 0, 0, 0, 0, 1, 0, 0, -1, 0 ], [ 0, 0, 0, 0, 0, 0, 1, 0, -1, 0 ], [ 0, 0, 0, 0, -1, 0, 0, 0, 0, 0 ],
+      [ 0, -1, -1, 0, 0, 1, 0, 0, 0, 0 ], [ 0, 0, -1, -1, 0, 0, 0, 1, 0, 0 ], [ 0, -1, 0, -1, 0, 0, 1, 0, 0, 0 ] ]
+    , [ 30, [ 10 ] ] ]
+    
+[ [ 0, 0, 0, 1, 0, 0, -1, -1, 1 ], [ 0, 1, 0, 0, 0, -1, -1, 0, 1 ], [ 0, 0, 1, 0, 0, -1, 0, -1, 1 ],
+  [ -1, 0, 0, 0, 0, 0, 0, 0, 0 ], [ 0, 0, 0, 0, 0, 0, 0, 1, -1 ], [ 0, 0, 0, 0, 0, 1, 0, 0, -1 ],
+  [ 0, 0, 0, 0, 0, 0, 1, 0, -1 ], [ 0, 0, 0, 0, -1, 0, 0, 0, 0 ], [ 0, -1, -1, 0, 0, 1, 0, 0, 0 ],
+  [ 0, 0, -1, -1, 0, 0, 0, 1, 0 ], [ 0, -1, 0, -1, 0, 0, 1, 0, 0 ] ]
+
+
+#ncinstancetop:=[[ ],1,4];
+#listofedge_top:=[[1],[2],[3],[4],[2,3],[2,4],[3,4],[2,3,4]];
+#numofVar:=4;
+SHLT:=AddconstraintsTopAndBottom_indep(ncinstancetop);;
+AAT:=Permute_marginalAndJoin(numofVar,listofedge_top);;
+SHTA:=Permute_matrix_parallel(SHLT[1],AAT);;
+SHT_P:=SHTA[1];;
+SbT:=SHLT[2];;
+A1:=SHTA[2];;
+linrowsT:=SHLT[3];;
+rlisttop:=ProjectOntoUseful_Var(SHT_P,SbT,Length(listofedge_top),linrowsT);
+
+[ [ [ 1, 0, 0, 0, 0, 0, 0, 0 ], [ 0, 0, 0, 0, 0, 0, 0, 0 ], [ 0, 1/4, 0, 0, 1/4, 1/4, 0, 1/4 ],
+      [ 0, 0, 0, 1/4, 0, 1/4, 1/4, 1/4 ], [ 0, 1/6, 0, 1/6, 1/6, 1/6, 1/6, 1/6 ],
+      [ 0, 0, 1/4, 0, 1/4, 0, 1/4, 1/4 ], [ 0, 0, 1/6, 1/6, 1/6, 1/6, 1/6, 1/6 ],
+      [ 0, 1/6, 1/6, 0, 1/6, 1/6, 1/6, 1/6 ], [ 0, 1/7, 1/7, 1/7, 1/7, 1/7, 1/7, 1/7 ],
+      [ 0, 1/11, 1/11, 1/11, 2/11, 2/11, 2/11, 2/11 ] ],
+  [ [ 0, 0, 1, 0, -1, 0, -1, 1, 0 ], [ 0, 1, 0, 0, -1, -1, 0, 1, 0 ], [ 0, 0, 0, 1, 0, -1, -1, 1, 0 ],
+      [ -1, 0, 0, 0, 0, 0, 0, 0, 0 ], [ 1, 1, 1, 1, 1, 1, 1, 1, 1 ], [ 0, 0, 0, 0, 0, 0, 1, -1, 0 ],
+      [ 0, 0, 0, 0, 1, 0, 0, -1, 0 ], [ 0, 0, 0, 0, 0, 1, 0, -1, 0 ], [ 0, -1, 0, -1, 0, 1, 0, 0, 0 ],
+      [ 0, 0, -1, -1, 0, 0, 1, 0, 0 ], [ 0, -1, -1, 0, 1, 0, 0, 0, 0 ] ], [ 27, [ 9 ] ] ]
+      
+  
+#ncinstancebottom:=[[  ],1,4];
+#listofedge_bottom:=[[1],[2],[3],[4],[2,3],[2,4],[3,4],[2,3,4]]; 
+#numofVar:=4;
+SHLT:=AddconstraintsTopAndBottom_noindep(ncinstancebottom);;
+AAT:=Permute_marginalAndJoin(numofVar,listofedge_bottom);;
+SHTA:=Permute_matrix_parallel(SHLT[1],AAT);;
+SHT_P:=SHTA[1];;
+SbT:=SHLT[2];;
+A1:=SHTA[2];;
+linrowsT:=SHLT[3];;
+rlistbottom:=ProjectOntoUseful_Var(SHT_P,SbT,Length(listofedge_bottom),linrowsT);
+
+Combine:=
+[ [ 0, 0, 1, 0, 0, -1, 0, -1, 1 ], [ 0, 1, 0, 0, 0, -1, -1, 0, 1 ], [ 0, 0, 0, 1, 0, 0, -1, -1, 1 ],
+  [ -1, 0, 0, 0, 0, 0, 0, 0, 0 ], [ 0, 0, 0, 0, 0, 0, 0, 1, -1 ], [ 0, 0, 0, 0, 0, 1, 0, 0, -1 ],
+  [ 0, 0, 0, 0, 0, 0, 1, 0, -1 ], [ 0, -1, 0, -1, 0, 0, 1, 0, 0 ], [ 0, 0, -1, -1, 0, 0, 0, 1, 0 ],
+  [ 0, -1, -1, 0, 0, 1, 0, 0, 0 ], [ 0, 0, 1, 0, 0, -1, 0, -1, 1 ], [ 0, 1, 0, 0, 0, -1, -1, 0, 1 ],
+  [ 0, 0, 0, 1, 0, 0, -1, -1, 1 ], [ 0, 0, 0, 0, -1, 0, 0, 0, 0 ], [ 0, 0, 0, 0, 0, 0, 0, 1, -1 ],
+  [ 0, 0, 0, 0, 0, 1, 0, 0, -1 ], [ 0, 0, 0, 0, 0, 0, 1, 0, -1 ], [ 0, -1, 0, -1, 0, 0, 1, 0, 0 ],
+  [ 0, 0, -1, -1, 0, 0, 0, 1, 0 ], [ 0, -1, -1, 0, 0, 1, 0, 0, 0 ] ];
