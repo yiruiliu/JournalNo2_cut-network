@@ -1,0 +1,102 @@
+GenShannonUnBounded_decomposed:=function ( N1,N2,N3 ) #Calculate \Gamma_{N1\cup N3}\time \Gamma_{N2\cup N3}
+  local  Ntop,ntop,Nbottom,nbottom,nwhole,rlist, mtx, str, i, j, shineq, 
+  nset_i, ineq, pairsTop, pairsBottom, p, Klist, K, nset_ij, greq, neq, A, b, s;
+  shineq := [  ];
+  Ntop := Union(N1,N3);
+  ntop := Size(Ntop);
+  Nbottom := Union(N2,N3);
+  nbotton := Size(Nbottom);
+  nwhole := Size(N1) + Size(N2) + Size(N3);
+  for i  in Ntop  do
+      nset_i := ShallowCopy(Ntop);
+      SubtractSet( nset_i, [ i ] );
+      ineq := ZeroMutable( [ 1 .. 2 ^ nwhole - 1] );
+      ineq[set2int( Ntop ) ] := 1;
+      ineq[set2int( nset_i ) ] := -1;
+      Append( shineq, [ ineq ] );
+  od;
+  for i  in Nbottom  do
+      nset_i := ShallowCopy(Nbottom);
+      SubtractSet( nset_i, [ i ] );
+      ineq := ZeroMutable( [ 1 .. 2 ^ nwhole - 1] );
+      ineq[set2int( Nbottom ) ] := 1;
+      ineq[set2int( nset_i ) ] := -1;
+      Append( shineq, [ ineq ] );
+  od;
+  pairsTop := Combinations( Ntop, 2 );
+  for p  in pairsTop  do
+      nset_ij := ShallowCopy(Ntop);
+      SubtractSet( nset_ij, p );
+      Klist := Combinations( nset_ij );
+      for K  in Klist  do
+          ineq := ZeroMutable( [ 1 .. 2 ^ nwhole - 1 ] );
+          ineq[set2int( Union( K, [ p[1] ] ) ) ] := 1;
+          ineq[set2int( Union( K, [ p[2] ] ) ) ] := 1;
+          ineq[set2int( Union( K, p ) ) ] := -1;
+          if Size( K ) > 0  then
+              ineq[set2int( K ) ] := -1;
+          fi;
+          Append( shineq, [ ineq ] );
+      od;
+  od;
+  pairsBottom := Combinations( Nbottom, 2 );
+  for p  in pairsBottom  do
+      nset_ij := ShallowCopy(Nbottom);
+      SubtractSet( nset_ij, p );
+      Klist := Combinations( nset_ij );
+      for K  in Klist  do
+          ineq := ZeroMutable( [ 1 .. 2 ^ nwhole - 1] );
+          ineq[set2int( Union( K, [ p[1] ] ) ) ] := 1;
+          ineq[set2int( Union( K, [ p[2] ] ) ) ] := 1;
+          ineq[set2int( Union( K, p ) ) ] := -1;
+          if Size( K ) > 0  then
+              ineq[set2int( K ) ] := -1;
+          fi;
+          Append( shineq, [ ineq ] );
+      od;
+  od;
+  shineq := - shineq;
+  b := ZeroMutable([1..Size(shineq)]);
+  return [ shineq, b ];
+end;
+
+NCShannonBounded_decomposition_entropy := function ( ncinstance, N1,N2,N3 )
+    local  ShOB, i, linrows, con, conlin, j, conineq;
+    ShOB := GenShannonUnBounded_decomposed( N1,N2,N3 );
+    i := Size( ShOB[1] ) + 1;
+    linrows := [  ];
+    for con  in ncinstance[1]  do
+        conlin := ZeroMutable( [ 1 .. 2 ^ ncinstance[3] - 1 ] );
+        conlin[set2int( con[1] )] := 1;
+        conlin[set2int( con[2] )] := -1;
+        Append( ShOB[1], [ conlin ] );
+        Append( ShOB[2], [ 0 ] );
+        Append( linrows, [ i ] );
+        i := i + 1;
+    od;
+    if ncinstance[2] > 1 then
+      conlin := ZeroMutable( [ 1 .. 2 ^ ncinstance[3] - 1 ] );
+      for j  in [ 1 .. ncinstance[2] ]  do
+          conlin[set2int( [ j ] )] := 1;
+      od;
+      conlin[set2int( [ 1 .. ncinstance[2] ] )] := -1;
+      Append( ShOB[1], [ conlin ] );
+      Append( ShOB[2], [ 0 ] );
+      Append( linrows, [ i ] );
+    fi;
+    return [ ShOB[1], ShOB[2], linrows ];
+end;
+
+######################## Try to find counter example
+#Gamma 6 with N1:=[1,2]; N2:=[6]; N3:=[3,4,5];  
+# listofedge:=[[1],[2],[3],[4],[5],[6],[3,4],[3,5],[4,5],[3,4,5]];
+# numofVar:=6;
+# ncinstance:=[[[[4,5],[4,5,6]]],1,6];
+SHLT:=NCShannonBounded_decomposition_entropy(ncinstance, N1,N2,N3 );
+AAT:=Permute_marginalAndJoin(numofVar,listofedge);;
+SHTA:=Permute_matrix_parallel(SHLT[1],AAT);;
+SHT_P:=SHTA[1];;
+SbT:=SHLT[2];;
+A1:=SHTA[2];;
+linrowsT:=SHLT[3];;
+rlistC:=ProjectOntoUseful_Var(SHT_P,SbT,Length(listofedge),linrowsT);
