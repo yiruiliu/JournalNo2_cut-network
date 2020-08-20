@@ -429,7 +429,7 @@ ThreeTimeProjection:=function(TopConstr, BotConstr, CutConstr, CutDim, FinalDim,
 	local RecTop, RecBot, N1Ncut, N2Ncut, i, RelaTopDim, RelaBotDim, RelaTopConstr, Constr,
 	RelaConstr, RelaBotConstr, SHLT, AAT, SHTA, SHT_P, SbT, linrowsT, rlistTop, SHLB,
 	AAB, SHBA, SHB_P, SbB, linrowsB, rlistBot, rlistTopT, rlistBotT, TBDim, TopDim, BotDim,
-	CombineT, SubEntropy, posi, ineqT, Combine, Cb, conlin, linrows, rlistCut;
+	CutDimsort, CombineT, SubEntropy, posi, ineqT, Combine, Cb, conlin, linrows, rlistCut;
 	RecTop := rec();
 	RecBot := rec();
 	N1Ncut := Union(N1, Ncut);
@@ -480,10 +480,10 @@ ThreeTimeProjection:=function(TopConstr, BotConstr, CutConstr, CutDim, FinalDim,
 	rlistBot:=ProjectOntoUseful_Var(SHB_P,SbB,Length(RelaBotDim),linrowsB);
 	rlistBotT:=CleanMatT(rlistBot);
 	
-	CutDim := ShallowCopy(FinalDim);
-	Append(CutDim,Difference(Union(TopDim,BotDim),FinalDim));
+	CutDimsort := ShallowCopy(FinalDim);
+	Append(CutDimsort,Difference(CutDim,FinalDim));
 	CombineT := [];
-	for SubEntropy in CutDim do
+	for SubEntropy in CutDimsort do
 		if SubEntropy in TopDim then
 			posi := Position(TopDim, SubEntropy);
 			ineqT := ShallowCopy(rlistTopT[posi]);
@@ -506,19 +506,19 @@ ThreeTimeProjection:=function(TopConstr, BotConstr, CutConstr, CutDim, FinalDim,
 	for Constr  in CutConstr  do     #### add cut Constraint
 		conlin := ZeroMutable( [ 1 .. Size(Combine[1])] );
 		for SubEntropy in Constr do
-			conlin[Position(CutDim, SubEntropy )] := 1;
+			conlin[Position(CutDimsort, SubEntropy )] := 1;
 		od;
-		conlin[Position(CutDim, Constr[Size(Constr)] )] := -1;
+		conlin[Position(CutDimsort, Constr[Size(Constr)] )] := -1;
 		Append( Combine, [ conlin ] );
 		Append( Cb, [ 0 ] );
 		Append( linrows, [ i ] );
 		i := i + 1;
 	od;
-	if Length(FinalDim) = Length(CutDim) then
-		return [Combine, Cb, linrows, CutDim];
+	if Length(FinalDim) = Length(CutDimsort) then
+		return [Combine, Cb, linrows, CutDimsort];
 	else
 		rlistCut := ProjectOntoUseful_Var(Combine,Cb,Length(FinalDim),linrows);
-		return [rlistCut, CutDim];
+		return [rlistCut, CutDimsort];
 	fi;
 end;
 
