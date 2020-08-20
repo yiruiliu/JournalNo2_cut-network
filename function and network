@@ -401,21 +401,42 @@ CleanMatT:=function(rlist)
 	return ansT{[1..Length(ansT)-1]};
 end;
 
-ThreeTimeProjection:=function(TopConstr, BotConstr, CutConstr, TopDim, BotDim, FinalDim, N1, N2, Ncut)
+CutDimToTBDim:=function(CutDim,N1Ncut,N2Ncut)
+	# CutDim := [[1],[2],[3],[4],[5],[6],[3,4],[3,5],[4,5],[3,4,5]];
+	# N1Ncut := [1,2,3,4,5];
+	# N2Ncut := [3,4,5,6];
+	local TopDim, BotDim, SubEntropy;
+	TopDim := [];
+	BotDim := [];
+	for SubEntropy in CutDim do
+		if IsSubset(N1Ncut, SubEntropy) then
+			Append(TopDim, [SubEntropy]);
+		fi;
+		if IsSubset(N2Ncut, SubEntropy) then
+			Append(BotDim, [SubEntropy]);
+		fi;
+	od;
+	return [TopDim, BotDim];
+end;
+
+ThreeTimeProjection:=function(TopConstr, BotConstr, CutConstr, CutDim, FinalDim, N1, N2, Ncut)
 	# TopConstr := [ [[1,2],[1,2,5] ] ];
 	# BotConstr := [ [[3],[3,4]] ] ;
         # CutConstr := [ [[5],[5,6]] ] ;
-	# TopDim := [[1],[2],[5],[6],[5,6]];
-	# BotDim := [[3],[4],[5],[6],[5,6]];
+	# Cut := [[1],[2],[3],[4],[5],[6],[5,6]];
 	# FinalDim := [[1],[2],[3],[4],[5],[6]];
+	# N1 := [1,2]; N2 := [3,4]; Ncut := [5,6];
 	local RecTop, RecBot, N1Ncut, N2Ncut, i, RelaTopDim, RelaBotDim, RelaTopConstr, Constr,
 	RelaConstr, RelaBotConstr, SHLT, AAT, SHTA, SHT_P, SbT, linrowsT, rlistTop, SHLB,
-	AAB, SHBA, SHB_P, SbB, linrowsB, rlistBot, rlistTopT, rlistBotT, CutDim, CombineT, SubEntropy,
-	posi, ineqT, Combine, Cb, conlin, linrows, rlistCut;
+	AAB, SHBA, SHB_P, SbB, linrowsB, rlistBot, rlistTopT, rlistBotT, TBDim, TopDim, BotDim,
+	CombineT, SubEntropy, posi, ineqT, Combine, Cb, conlin, linrows, rlistCut;
 	RecTop := rec();
 	RecBot := rec();
 	N1Ncut := Union(N1, Ncut);
 	N2Ncut := Union(N2, Ncut);
+	TBDim := CutDimToTBDim(CutDim,N1Ncut,N2Ncut);
+	TopDim := TBDim[1];
+	BotDim := TBDim[2];
 	Sort(N1Ncut);
 	Sort(N2Ncut);
 	for i in [1..Size(N1Ncut)] do
