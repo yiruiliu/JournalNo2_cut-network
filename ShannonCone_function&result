@@ -1411,3 +1411,27 @@ C:=TransposedMat(CleanMatT(rlistC));
   [ 0, 1, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0 ], [ 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0 ],
   [ 0, 0, 0, 1, 0, 0, 0, 0, 0, -1, 0, 0, 0 ], [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0 ],
   [ 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0 ] ];
+  
+  
+  ########2 (with constraint) ##(good)
+  TopConstr:=[[[2,3],[2,3,4]]];
+BotConstr:=[[[6,7],[6,7,8]],[[4,5],[4,5,6]]];
+CutConstr:=[];
+N1:=[1,2,3]; N2:=[6,7]; N3:=[4,5,8]; Ncut:=[4,5,8];
+CutDim:=[[1],[2],[3],[6],[7],[1,2,8],[5,6,7],[4,7,8],[1,2,3],[6,7],[4],[5],[8],[4,5],[4,8],[5,8],[4,5,8]];
+FinalDim:=CutDim;
+SHB:=ThreeTimeProjection(TopConstr, BotConstr, CutConstr, CutDim, FinalDim, N1, N2, Ncut);
+listofedge:=SHB[3];
+Combine:=SHB[1];
+
+ncinstance:=[[[[2,3],[2,3,4]],[[6,7],[6,7,8]],[[4,5],[4,5,6]]],1,8];
+numofVar:=8;
+SHLT:=NCShannonBounded_decomposition_entropy(ncinstance, N1,N2,N3 );;
+AAT:=Permute_marginalAndJoin(numofVar,listofedge);;
+SHTA:=Permute_matrix_parallel(SHLT[1],AAT);;
+SHT_P:=SHTA[1];;
+SbT:=SHLT[2];;
+A1:=SHTA[2];;
+linrowsT:=SHLT[3];
+rlistC:=ProjectOntoUseful_Var(SHT_P,SbT,Length(listofedge),linrowsT);
+C:=TransposedMat(CleanMatT(rlistC));
