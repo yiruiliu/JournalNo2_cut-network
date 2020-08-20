@@ -411,7 +411,7 @@ ThreeTimeProjection:=function(TopConstr, BotConstr, CutConstr, TopDim, BotDim, F
 	local RecTop, RecBot, N1Ncut, N2Ncut, i, RelaTopDim, RelaBotDim, RelaTopConstr, Constr,
 	RelaConstr, RelaBotConstr, SHLT, AAT, SHTA, SHT_P, SbT, linrowsT, rlistTop, SHLB,
 	AAB, SHBA, SHB_P, SbB, linrowsB, rlistBot, rlistTopT, rlistBotT, CutDim, CombineT, SubEntropy,
-	posi, ineqT, Combine, Cb, conlin, linrows;
+	posi, ineqT, Combine, Cb, conlin, linrows, rlistCut;
 	RecTop := rec();
 	RecBot := rec();
 	N1Ncut := Union(N1, Ncut);
@@ -493,7 +493,12 @@ ThreeTimeProjection:=function(TopConstr, BotConstr, CutConstr, TopDim, BotDim, F
 		Append( linrows, [ i ] );
 		i := i + 1;
 	od;
-	return [Combine, Cb, linrows];
+	if Length(FinalDim) = Length(CutDim) then
+		return [Combine, Cb, linrows, CutDim];
+	else
+		rlistCut := ProjectOntoUseful_Var(Combine,Cb,Length(FinalDim),linrows);
+		return [rlistCut, CutDim];
+	fi;
 end;
 
 ###### Three Time Projection (end)
