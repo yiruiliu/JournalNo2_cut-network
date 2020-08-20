@@ -351,6 +351,152 @@ ProjectOntoUseful_Var:=function(SH_P,Sb1,ProjDim,linrows)
 	return rlist;
 end;
 
+####### Three Time projection (begin)
+
+RelativeDim:=function(RecTB,TBDim)
+	local Ans, SubEntropy, RelaSub, Signleton, RelaS;
+	Ans:=[];
+	for SubEntropy in TBDim do
+		RelaSub := [];
+		for Signleton in SubEntropy do
+			RelaS := RecTB.(Signleton);
+			Append(RelaSub,[RelaS]);
+		od;
+		Append(Ans,[RelaSub]);
+	od;
+	return Ans;
+end;
+
+
+AddconstraintsThreeTimeProj:=function(TBConstr)
+	# TopConstr :=[ [ [[1,2],[1,2,5] ] ],4];
+	local linrows,i,ShOB1,Constr,SubEntropy,conlin;
+	ShOB1 := GenShannonUnBounded( TBConstr[2] );
+	i := Size( ShOB1[1] ) + 1;
+	linrows := [  ];
+	for Constr  in TBConstr[1]  do     #### add Constraint
+		conlin := ZeroMutable( [ 1 .. 2 ^ TBConstr[2] - 1 ] );
+		for SubEntropy in Constr do
+			conlin[set2int( SubEntropy )] := 1;
+		od;
+		conlin[set2int( Constr[Size(Constr)] )] := -1;
+		Append( ShOB1[1], [ conlin ] );
+		Append( ShOB1[2], [ 0 ] );
+		Append( linrows, [ i ] );
+		i := i + 1;
+	od;
+	return [ShOB1[1],ShOB1[2],linrows];
+end;
+
+CleanMat:=function(rlist)
+	local len, ans, c, ansT;
+	len := Length(rlist[2][1]);
+	ans := [];
+	for c in rlist[2] do
+		if c[len] = 0 then
+			Append(ans,[c]);
+		fi;
+	od;
+	ansT := TransposedMat(ans);
+	return ansT{[1..Length(ansT)-1]};
+end;
+
+ThreeTimeProjection:=function(TopConstr, BotConstr, CutConstr, TopDim, BotDim, FinalDim, N1, N2, Ncut)
+	# TopConstr :=[ [ [[1,2],[1,2,5] ] ],4];
+	# BotConstr :=[ [ [[3],[3,4]] ],4] ;
+        # CutConstr :=[ [ [[5],[5,6]] ],0] ;
+	# TopDim := [[1],[2],[5],[6],[5,6]];
+	# BotDim := [[3],[4],[5],[6],[5,6]];
+	# FinalDim := [[1],[2],[3],[4],[5],[6]];
+	local RecTop, RecBot, N1Ncut, N2Ncut, i, RelaTopDim, RelaBotDim, RelaTopConstr, Constr,
+	RelaConstr, RelaBotConstr, SHLT, AAT, SHTA, SHT_P, SbT, linrowsT, rlistTop, SHLB,
+	AAB, SHBA, SHB_P, SbB, linrowsB, rlistBot, rlistTopT, rlistBotT, CutDim, CombineT, SubEntropy,
+	posi, ineqT, Combine, Cb, conlin, linrows;
+	RecTop := rec();
+	RecBot := rec();
+	N1Ncut := Union(N1, Ncut);
+	N2Ncut := Union(N2, Ncut);
+	Sort(N1Ncut);
+	Sort(N2Ncut);
+	for i in [1..Size(N1Ncut)] do
+		RecTop.(N1Ncut[i]) := i;
+	od;
+	for i in [1..Size(N2Ncut)] do
+		RecBot.(N2Ncut[i]) := i;
+	od;
+	RelaTopDim := RelativeDim(RecTop, TopDim);
+	RelaBotDim := RelativeDim(RecBot, BotDim);
+	RelaTopConstr := [[],TopConstr[2]];
+	if Size(TopConstr[1]) > 0 then
+		for Constr in TopConstr[1] do
+			RelaConstr := RelativeDim(RecTop, Constr);
+			Append(RelaTopConstr[1],[RelaConstr]);
+		od;
+	fi;
+	RelaBotConstr := [[],BotConstr[2]];
+	if Size(BotConstr[1]) > 0 then
+		for Constr in BotConstr[1] do 
+			RelaConstr := RelativeDim(RecBot, Constr);
+			Append(RelaBotConstr[1],[RelaConstr]);
+		od;
+	fi;
+	
+	SHLT := AddconstraintsThreeTimeProj(RelaTopConstr);
+	AAT := Permute_marginalAndJoin(RelaTopConstr[2],RelaTopDim);
+	SHTA := Permute_matrix_parallel(SHLT[1],AAT);
+	SHT_P := SHTA[1];
+	SbT := SHLT[2];
+	linrowsT := SHLT[3];
+	rlistTop:=ProjectOntoUseful_Var(SHT_P,SbT,Length(RelaTopDim),linrowsT);
+	rlistTopT:=TransposedMat(CleanMat(rlistTop));
+	
+	SHLB := AddconstraintsThreeTimeProj(RelaBotConstr);
+	AAB := Permute_marginalAndJoin(RelaBotConstr[2],RelaBotDim);
+	SHBA := Permute_matrix_parallel(SHLB[1],AAB);
+	SHB_P := SHBA[1];
+	SbB := SHLB[2];
+	linrowsB := SHLB[3];
+	rlistBot:=ProjectOntoUseful_Var(SHB_P,SbB,Length(RelaBotDim),linrowsB);
+	rlistBotT:=TransposedMat(CleanMat(rlistBot));
+	
+	CutDim := ShallowCopy(FinalDim);
+	Append(CutDim,Difference(Union(TopDim,BotDim),FinalDim));
+	CombineT := [];
+	for SubEntropy in CutDim do
+		if SubEntropy in TopDim then
+			posi := Position(TopDim, SubEntropy);
+			ineqT := ShallowCopy(rlistTopT[posi]);
+		else
+			ineqT := ZeroMutable([1..Size(rlistTopT[1])]);
+		fi;
+		if SubEntropy in BotDim then
+			posi := Position(BotDim, SubEntropy);
+			Append(ineqT,ShallowCopy(rlistBotT[posi]));
+		else
+			Append(ineqT, ZeroMutable([1..Size(rlistBotT[1])]));
+		fi;
+		Append(CombineT,[ineqT]);
+	od;
+	Combine := ShallowCopy(TransposedMat(CombineT));
+	Cb := ZeroMutable([1..Size(Combine)]);
+	
+	i := Size( Combine ) + 1;
+	linrows := [  ];
+	for Constr  in CutConstr[1]  do     #### add cut Constraint
+		conlin := ZeroMutable( [ 1 .. Size(Combine[1])] );
+		for SubEntropy in Constr do
+			conlin[Position(CutDim, SubEntropy )] := 1;
+		od;
+		conlin[Position(CutDim, Constr[Size(Constr)] )] := -1;
+		Append( Combine, [ conlin ] );
+		Append( Cb, [ 0 ] );
+		Append( linrows, [ i ] );
+		i := i + 1;
+	od;
+	return [Combine, Cb, linrows];
+end;
+
+###### Three Time Projection (end)
 #ncinstancetop:=[[ [[8],[3,8]], [[8,9],[1,2,8,9]] ],3,9];
 #listofedge_top:=[[1],[2],[3],[4],[5],[6],[7],[8],[9],[1,2,4],[1,3,5],[4,5],[6,7],[6,7,8],[7,9]]; #[1,2],[1,3] has equalities
 #numofVar:=9;
