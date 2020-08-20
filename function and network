@@ -522,6 +522,32 @@ ThreeTimeProjection:=function(TopConstr, BotConstr, CutConstr, CutDim, FinalDim,
 	fi;
 end;
 
+NCShannonBounded_decomposition_entropy := function ( ncinstance, N1,N2,N3 )
+    local  ShOB, i, linrows, con, conlin, j, conineq;
+    ShOB := GenShannonUnBounded_decomposed( N1,N2,N3 );
+    i := Size( ShOB[1] ) + 1;
+    linrows := [  ];
+    for con  in ncinstance[1]  do
+        conlin := ZeroMutable( [ 1 .. 2 ^ ncinstance[3] - 1 ] );
+        conlin[set2int( con[1] )] := 1;
+        conlin[set2int( con[2] )] := -1;
+        Append( ShOB[1], [ conlin ] );
+        Append( ShOB[2], [ 0 ] );
+        Append( linrows, [ i ] );
+        i := i + 1;
+    od;
+    if ncinstance[2] > 1 then
+      conlin := ZeroMutable( [ 1 .. 2 ^ ncinstance[3] - 1 ] );
+      for j  in [ 1 .. ncinstance[2] ]  do
+          conlin[set2int( [ j ] )] := 1;
+      od;
+      conlin[set2int( [ 1 .. ncinstance[2] ] )] := -1;
+      Append( ShOB[1], [ conlin ] );
+      Append( ShOB[2], [ 0 ] );
+      Append( linrows, [ i ] );
+    fi;
+    return [ ShOB[1], ShOB[2], linrows ];
+end;
 ###### Three Time Projection (end)
 #ncinstancetop:=[[ [[8],[3,8]], [[8,9],[1,2,8,9]] ],3,9];
 #listofedge_top:=[[1],[2],[3],[4],[5],[6],[7],[8],[9],[1,2,4],[1,3,5],[4,5],[6,7],[6,7,8],[7,9]]; #[1,2],[1,3] has equalities
