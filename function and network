@@ -402,9 +402,9 @@ CleanMatT:=function(rlist)
 end;
 
 ThreeTimeProjection:=function(TopConstr, BotConstr, CutConstr, TopDim, BotDim, FinalDim, N1, N2, Ncut)
-	# TopConstr :=[ [ [[1,2],[1,2,5] ] ],4];
-	# BotConstr :=[ [ [[3],[3,4]] ],4] ;
-        # CutConstr :=[ [ [[5],[5,6]] ],0] ;
+	# TopConstr := [ [[1,2],[1,2,5] ] ];
+	# BotConstr := [ [[3],[3,4]] ] ;
+        # CutConstr := [ [[5],[5,6]] ] ;
 	# TopDim := [[1],[2],[5],[6],[5,6]];
 	# BotDim := [[3],[4],[5],[6],[5,6]];
 	# FinalDim := [[1],[2],[3],[4],[5],[6]];
@@ -426,16 +426,16 @@ ThreeTimeProjection:=function(TopConstr, BotConstr, CutConstr, TopDim, BotDim, F
 	od;
 	RelaTopDim := RelativeDim(RecTop, TopDim);
 	RelaBotDim := RelativeDim(RecBot, BotDim);
-	RelaTopConstr := [[],TopConstr[2]];
-	if Size(TopConstr[1]) > 0 then
-		for Constr in TopConstr[1] do
+	RelaTopConstr := [[],Size(N1Ncut)];
+	if Size(TopConstr) > 0 then
+		for Constr in TopConstr do
 			RelaConstr := RelativeDim(RecTop, Constr);
 			Append(RelaTopConstr[1],[RelaConstr]);
 		od;
 	fi;
-	RelaBotConstr := [[],BotConstr[2]];
-	if Size(BotConstr[1]) > 0 then
-		for Constr in BotConstr[1] do 
+	RelaBotConstr := [[],Size(N2Ncut)];
+	if Size(BotConstr) > 0 then
+		for Constr in BotConstr do 
 			RelaConstr := RelativeDim(RecBot, Constr);
 			Append(RelaBotConstr[1],[RelaConstr]);
 		od;
@@ -482,7 +482,7 @@ ThreeTimeProjection:=function(TopConstr, BotConstr, CutConstr, TopDim, BotDim, F
 	
 	i := Size( Combine ) + 1;
 	linrows := [  ];
-	for Constr  in CutConstr[1]  do     #### add cut Constraint
+	for Constr  in CutConstr  do     #### add cut Constraint
 		conlin := ZeroMutable( [ 1 .. Size(Combine[1])] );
 		for SubEntropy in Constr do
 			conlin[Position(CutDim, SubEntropy )] := 1;
