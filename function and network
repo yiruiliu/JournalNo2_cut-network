@@ -448,7 +448,7 @@ ThreeTimeProjection:=function(TopConstr, BotConstr, CutConstr, TopDim, BotDim, F
 	SbT := SHLT[2];
 	linrowsT := SHLT[3];
 	rlistTop:=ProjectOntoUseful_Var(SHT_P,SbT,Length(RelaTopDim),linrowsT);
-	rlistTopT:=TransposedMat(CleanMat(rlistTop));
+	rlistTopT:=CleanMat(rlistTop);
 	
 	SHLB := AddconstraintsThreeTimeProj(RelaBotConstr);
 	AAB := Permute_marginalAndJoin(RelaBotConstr[2],RelaBotDim);
@@ -457,7 +457,7 @@ ThreeTimeProjection:=function(TopConstr, BotConstr, CutConstr, TopDim, BotDim, F
 	SbB := SHLB[2];
 	linrowsB := SHLB[3];
 	rlistBot:=ProjectOntoUseful_Var(SHB_P,SbB,Length(RelaBotDim),linrowsB);
-	rlistBotT:=TransposedMat(CleanMat(rlistBot));
+	rlistBotT:=CleanMat(rlistBot);
 	
 	CutDim := ShallowCopy(FinalDim);
 	Append(CutDim,Difference(Union(TopDim,BotDim),FinalDim));
