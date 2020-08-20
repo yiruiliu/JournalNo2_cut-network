@@ -515,10 +515,10 @@ ThreeTimeProjection:=function(TopConstr, BotConstr, CutConstr, CutDim, FinalDim,
 		i := i + 1;
 	od;
 	if Length(FinalDim) = Length(CutDimsort) then
-		return [Combine, Cb, linrows, CutDimsort];
+		return [Combine, linrows, CutDimsort];
 	else
 		rlistCut := ProjectOntoUseful_Var(Combine,Cb,Length(FinalDim),linrows);
-		return [rlistCut, CutDimsort];
+		return [TransposedMat(CleanMatT(rlistCut)), [], CutDimsort];
 	fi;
 end;
 
