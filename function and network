@@ -624,7 +624,7 @@ ImpliedEqualityinProjRegion := function(Constraints,numofVar, listofedge)
 		posi := Positions(vec,1);
 		if not posi = [] then
 			if posi[1] > OriginDimSize - ProjDimSize then
-				Append(EqProjR, [vec{[OriginDimSize - ProjDimSize + 1, OriginDimSize]}]);
+				Append(EqProjR, [vec{[OriginDimSize - ProjDimSize + 1 .. OriginDimSize]}]);
 				removPosi := posi[1] - OriginDimSize + ProjDimSize;
 				Append(listofedgeToRemov, [listofedgeR[removPosi]]);
 			fi;
