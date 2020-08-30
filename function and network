@@ -608,7 +608,7 @@ ImpliedEqualityinProjRegion := function(Constraints,numofVar, listofedge)
 	#numofVar:=6;
 	#listofedge:=[[1],[2],[3],[4],[5],[6],[4,5],[4,6],[5,6],[4,5,6]];
 	local EqMatrix, PermIndi, EqMatrixP, EqMatrixPR, listofedgeR, rrefEqMatrixPR, OriginDimSize,
-	ProjDimSize, vec, posi, EqProjR, listofedgeToRemov, removPosi, listofedgeToKeep, EqProj;
+	ProjDimSize, vec, posi, EqProjR, posiToRemovR, removPosi, listofedgeToKeep, EqProj;
 	EqMatrix := ImpliedEqualities(Constraints,numofVar);
 	PermIndi := Permute_marginalAndJoin(numofVar,listofedge);
 	EqMatrixP := Permute_matrix_parallel(EqMatrix,PermIndi);
@@ -619,18 +619,18 @@ ImpliedEqualityinProjRegion := function(Constraints,numofVar, listofedge)
 	OriginDimSize := Size(rrefEqMatrixPR[1]);
 	ProjDimSize := Size(listofedge);
 	EqProjR := [];
-	listofedgeToRemov := [];
+	posiToRemovR := [];
 	for vec in rrefEqMatrixPR do
 		posi := Positions(vec,1);
 		if not posi = [] then
 			if posi[1] > OriginDimSize - ProjDimSize then
 				Append(EqProjR, [vec{[OriginDimSize - ProjDimSize + 1 .. OriginDimSize]}]);
 				removPosi := posi[1] - OriginDimSize + ProjDimSize;
-				Append(listofedgeToRemov, [listofedgeR[removPosi]]);
+				Append(posiToRemovR, [removPosi]);
 			fi;
 		fi;
 	od;
-	listofedgeToKeep := Difference(listofedge, listofedgeToRemov);
+	listofedgeToKeep := Reversed(listofedgeR{Difference([1..Size(listofedgeR)], posiToRemovR)});
 	EqProj := TransposedMat(Reversed(TransposedMat(EqProjR)));
 	return [EqProj, listofedgeToKeep];
 end;
