@@ -639,14 +639,14 @@ end;
 #numofVar:=9;
 
 
-SHLT:=AddconstraintsTopAndBottom_indep(ncinstancetop);;
-AAT:=Permute_marginalAndJoin(numofVar,listofedge_top);;
-SHTA:=Permute_matrix_parallel(SHLT[1],AAT);;
-SHT_P:=SHTA[1];;
-SbT:=SHLT[2];;
-A1:=SHTA[2];;
-linrowsT:=SHLT[3];;
-rlistTop:=ProjectOntoUseful_Var(SHT_P,SbT,Length(listofedge_top),linrowsT);
+#SHLT:=AddconstraintsTopAndBottom_indep(ncinstancetop);;
+#AAT:=Permute_marginalAndJoin(numofVar,listofedge_top);;
+#SHTA:=Permute_matrix_parallel(SHLT[1],AAT);;
+#SHT_P:=SHTA[1];;
+#SbT:=SHLT[2];;
+#A1:=SHTA[2];;
+#linrowsT:=SHLT[3];;
+#rlistTop:=ProjectOntoUseful_Var(SHT_P,SbT,Length(listofedge_top),linrowsT);
 
 AddOmegaAndR := function(A,Equal,numofSource, numofEdge)
 	local numofVar, j, conineq, linrows, b;
