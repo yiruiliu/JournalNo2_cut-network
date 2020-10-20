@@ -677,3 +677,55 @@ AddOmegaAndR := function(A,Equal,numofSource, numofEdge)
 	b := ZeroMutable([1..Size(A)]);
 	return[A,b,linrows];
 end;
+
+
+################### 10/19/2020 
+Net2DominateSubEntros := function(ncinstance)
+	local DominSubEntros, EntroPair;
+	DominSubEntros := [[1..ncinstance[2]]];
+	for EntroPair in ncinstance[1] do
+		if Size(EntroPair[1]) > Size(EntroPair[2]) then
+			Append(DominSubEntros,[EntroPair[1]]);
+		else
+			Append(DominSubEntros,[EntroPair[2]]);
+		fi;
+	od;
+	return DominSubEntros;
+end;
+
+CutValidation := function(DominSubEntros, N1, N2, Ncut)
+	local N1Ncut, N2Ncut, SubEntro;
+	N1Ncut := Union(N1, Ncut);
+	N2Ncut := Union(N2, Ncut);
+	for SubEntro in DominSubEntros do
+		if Difference(SubEntro, N1Ncut) = [] or Difference(SubEntro, N2Ncut) = [] then
+			continue;
+		else
+			return false;
+		fi;
+	od;
+	return true;
+end;
+
+Net2ValidCut := function(ncinstance)
+	local DominSubEntros, ParIter, par, ValidCut;
+	ValidCut := [];
+	DominSubEntros := Net2DominateSubEntros(ncinstance);
+	ParIter := IteratorList(PartitionsSet([1..ncinstance[3]],3));
+	while not IsDoneIterator(ParIter) do
+		par := NextIterator(ParIter);
+		if CutValidation(DominSubEntros, par[1], par[2], par[3]) then
+			Append(ValidCut,[[par[1], par[2], par[3]]]);
+			continue;
+		elif CutValidation(DominSubEntros, par[1], par[3], par[2]) then
+			Append(ValidCut,[[par[1], par[3], par[2]]]);
+			continue;
+		elif CutValidation(DominSubEntros, par[3], par[2], par[1]) then
+			Append(ValidCut,[[par[3], par[2], par[1]]]);
+			continue;
+		fi;
+	od;
+	return ValidCut;
+end;
+
+
