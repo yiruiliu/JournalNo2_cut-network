@@ -1435,3 +1435,74 @@ A1:=SHTA[2];;
 linrowsT:=SHLT[3];
 rlistC:=ProjectOntoUseful_Var(SHT_P,SbT,Length(listofedge),linrowsT);
 C:=TransposedMat(CleanMatT(rlistC));
+
+
+ ########### 3 (no constraint) #(GOOD)
+  TopConstr:=[];
+BotConstr:=[];
+CutConstr:=[];
+N1:=[1,2]; N2:=[5,6]; N3:=[3,4,7,8]; Ncut:=[3,4,7,8];
+CutDim:=[[3],[4],[7],[8],[ 3, 4 ], [ 3, 7 ], [ 3, 8 ], [ 4, 7 ], [ 4, 8 ], [ 7, 8 ],[ 3, 4, 7 ], [ 3, 4, 8 ], [ 3, 7, 8 ], [ 4, 7, 8 ],[3,4,7,8]];
+FinalDim:=CutDim;
+SHB:=ThreeTimeProjection(TopConstr, BotConstr, CutConstr, CutDim, FinalDim, N1, N2, Ncut);
+listofedge:=SHB[3];
+Combine:=SHB[1];
+
+numofVar:=8;
+SHLT:=GenShannonUnBounded_decomposed(N1,N2,N3);;
+AAT:=Permute_marginalAndJoin(numofVar,listofedge);;
+SHTA:=Permute_matrix_parallel(SHLT[1],AAT);;
+SHT_P:=SHTA[1];;
+SbT:=SHLT[2];;
+A1:=SHTA[2];;
+linrowsT:=[];
+rlistC:=ProjectOntoUseful_Var(SHT_P,SbT,Length(listofedge),linrowsT);
+C:=TransposedMat(CleanMatT(rlistC));
+
+ ########### 4 (no constraint) # good
+  TopConstr:=[];
+BotConstr:=[];
+CutConstr:=[];
+N1:=[1,2,3,6]; N2:=[7,8]; N3:=[4,5,9,10]; Ncut:=N3;
+CutDim:=[ [1], [ 4 ], [ 5 ], [7],[ 9 ], [ 10 ], [ 4, 5 ], [ 4, 9 ], [ 4, 10 ], [ 5, 9 ], [ 5, 10 ], [ 9, 10 ], [ 4, 5, 9 ], [ 4, 5, 10 ], [ 4, 9, 10 ],
+  [ 5, 9, 10 ], [ 4, 5, 9, 10 ] ];
+FinalDim:=CutDim;
+SHB:=ThreeTimeProjection(TopConstr, BotConstr, CutConstr, CutDim, FinalDim, N1, N2, Ncut);
+listofedge:=SHB[3];
+Combine:=SHB[1];
+
+numofVar:=10;
+SHLT:=GenShannonUnBounded_decomposed(N1,N2,N3);;
+AAT:=Permute_marginalAndJoin(numofVar,listofedge);;
+SHTA:=Permute_matrix_parallel(SHLT[1],AAT);;
+SHT_P:=SHTA[1];;
+SbT:=SHLT[2];;
+A1:=SHTA[2];;
+linrowsT:=[];
+rlistC:=ProjectOntoUseful_Var(SHT_P,SbT,Length(listofedge),linrowsT);
+C:=TransposedMat(CleanMatT(rlistC));
+
+
+ ########### 5 (no constraint) #good
+  TopConstr:=[];
+BotConstr:=[];
+CutConstr:=[];
+N1:=[1,2,3,6]; N2:=[7,8]; N3:=[4,5,9,10]; Ncut:=N3;
+CutDim:=[ [1], [2],[ 4 ], [ 5 ], [ 9 ], [ 10 ], [ 4, 5 ], [ 4, 9 ], [ 4, 10 ], [ 5, 9 ], [ 5, 10 ], [ 9, 10 ], [ 4, 5, 9 ], [ 4, 5, 10 ], [ 4, 9, 10 ],
+  [ 5, 9, 10 ], [ 4, 5, 9, 10 ] ];
+FinalDim:=CutDim;
+SHB:=ThreeTimeProjection(TopConstr, BotConstr, CutConstr, CutDim, FinalDim, N1, N2, Ncut);
+listofedge:=SHB[3];
+Combine:=SHB[1];
+
+numofVar:=10;
+SHLT:=GenShannonUnBounded_decomposed(N1,N2,N3);;
+AAT:=Permute_marginalAndJoin(numofVar,listofedge);;
+SHTA:=Permute_matrix_parallel(SHLT[1],AAT);;
+SHT_P:=SHTA[1];;
+SbT:=SHLT[2];;
+A1:=SHTA[2];;
+linrowsT:=[];
+rlistC:=ProjectOntoUseful_Var(SHT_P,SbT,Length(listofedge),linrowsT);
+C:=TransposedMat(CleanMatT(rlistC));
+
